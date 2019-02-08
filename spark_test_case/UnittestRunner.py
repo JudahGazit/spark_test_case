@@ -44,7 +44,7 @@ class UnittestRunner:
         last_modified_time = watcher.get_dir_modified_time(os.getcwd())
         if last_modified_time > max_modified_time:
             self.__try_rerun_tests(test_module)
-            return last_modified_time
+        return last_modified_time
 
     def run(self, test_module, wait_time=consts.WAIT_TIME_BETWEEN_CHECKS):
         max_directory_modified_time = 0
