@@ -1,3 +1,4 @@
+import pyspark.sql.functions as F
 from pyspark.sql.types import *
 
 from MockClass import MockClass
@@ -43,3 +44,9 @@ class UnittestDemo(SparkTestCase):
                                                 ]
                                                 ]], struct_type)
         self.assertDataFramesEqual(expected, dataframe)
+
+    def test_udf(self):
+        dataframe = self.spark.createDataFrame([['a']], 'col1: string')
+        expected = self.spark.createDataFrame([['a', 'spark_test_case/consts.pyc']], 'col1: string, col2: string')
+        dataframe = dataframe.withColumn('col2', F.udf(MockClass().udf_action)('col1'))
+        self.assertDataFramesEqual(expected, dataframe, check_columns_order=False)
