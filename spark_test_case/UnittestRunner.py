@@ -13,7 +13,8 @@ from spark_test_case.DirectoryUpdateWatcher import DirectoryUpdateWatcher
 
 
 class UnittestRunner:
-    def __init__(self, append_spark_config={}):
+    def __init__(self, append_spark_config=None):
+        append_spark_config = append_spark_config or {}
         self.__create_spark_context(append_spark_config)
         self.loader = unittest.TestLoader()
 
@@ -32,19 +33,23 @@ class UnittestRunner:
     def __try_rerun_tests(self, test_module):
         try:
             reloader = DirectoryReloader()
+            # Doing twice in order to make sure that all imports are using the most updated version
             reloader.reload_directory(os.getcwd())
-            reloader.reload_directory(
-                os.getcwd())  # Doing twise in order to make sure that all imports are using the most updated version
+            reloader.reload_directory(os.getcwd())
             self.__run_tests_in_module(test_module)
         except Exception:
             traceback.print_exc()
 
-    def run(self, test_module, wait_time=3):
-        max_modified_time = 0
+    def __run_tests_when_directory_modified(self, test_module, watcher, max_modified_time):
+        last_modified_time = watcher.get_dir_modified_time(os.getcwd())
+        if last_modified_time > max_modified_time:
+            self.__try_rerun_tests(test_module)
+            return last_modified_time
+
+    def run(self, test_module, wait_time=consts.WAIT_TIME_BETWEEN_CHECKS):
+        max_directory_modified_time = 0
         watcher = DirectoryUpdateWatcher()
         while True:
-            last_modified_time = watcher.get_dir_modified_time(os.getcwd())
-            if last_modified_time > max_modified_time:
-                max_modified_time = last_modified_time
-                self.__try_rerun_tests(test_module)
+            max_directory_modified_time = self.__run_tests_when_directory_modified(test_module, watcher,
+                                                                                   max_directory_modified_time)
             time.sleep(wait_time)

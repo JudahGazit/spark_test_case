@@ -6,3 +6,4 @@ SPARK_DEFAULT_CONF = {
 
 IGNORE_DIRS = ['\\.git', '\\.idea']
 EXTENSIONS_TO_WATCH = ['py', 'json']
+WAIT_TIME_BETWEEN_CHECKS = 3
