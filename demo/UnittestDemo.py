@@ -1,12 +1,7 @@
-import unittest
-from pprint import pprint
-
-from pyspark import SparkContext, SparkConf, Row
-from pyspark.sql import SparkSession
 from pyspark.sql.types import *
 
-from spark_test_case.SparkTestCase import SparkTestCase
 from MockClass import MockClass
+from spark_test_case import SparkTestCase
 
 
 class UnittestDemo(SparkTestCase):
