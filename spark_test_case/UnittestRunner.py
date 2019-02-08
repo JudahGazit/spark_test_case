@@ -1,9 +1,11 @@
-import sys
 import os
+import re
+import sys
+import time
+import unittest
 
 from pyspark import SparkConf, SparkContext
 from pyspark.sql import SparkSession
-import unittest
 
 from spark_test_case import consts
 
@@ -34,9 +36,28 @@ class UnittestRunner:
                 if not module_is_main and module_in_working_directory:
                     reload(module)
 
+    def __get_files_in_dir(self, root_dir, ignore_dir='(\\.git|\\.idea)', extensions=['py', 'json']):
+        files = []
+        file_extensions_pattern = '.*\\.({})$'.format('|'.join(extensions))
+        for root, directories, filenames in os.walk(root_dir):
+            if re.search(ignore_dir, root) is None:
+                for filename in filenames:
+                    if re.match(file_extensions_pattern, filename) is not None:
+                        files.append(os.path.join(root, filename))
+        return files
+
+    def __get_dir_modified_time(self, root_dir):
+        files = self.__get_files_in_dir(os.getcwd())
+        files_modified_time = [os.path.getmtime(filename) for filename in files]
+        last_modified_time = max(files_modified_time)
+        return last_modified_time
+
     def run(self, test_module):
+        max_modified_time = 0
         while True:
-            raw_input('Press ENTER to rerun...')
-            print 'Running...'
-            self.__reload_all_modules()
-            self._run_tests_in_module(test_module)
+            last_modified_time = self.__get_dir_modified_time(os.getcwd())
+            if last_modified_time > max_modified_time:
+                max_modified_time = last_modified_time
+                self.__reload_all_modules()
+                self._run_tests_in_module(test_module)
+            time.sleep(3)

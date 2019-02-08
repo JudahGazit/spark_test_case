@@ -7,7 +7,7 @@ from pyspark.sql.types import *
 
 class SparkTestCase(unittest.TestCase):
     def __init__(self, *args, **kwargs):
-        super(SparkTestCase, self).__init__(*args, **kwargs)
+        unittest.TestCase.__init__(self, *args, **kwargs)
 
     @classmethod
     def setUpClass(cls):
