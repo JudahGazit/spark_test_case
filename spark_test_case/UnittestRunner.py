@@ -57,7 +57,7 @@ class UnittestRunner:
     def __try_rerun_tests(self, test_module):
         try:
             self.__reload_all_modules()
-            self.__reload_all_modules()
+            self.__reload_all_modules()  # Doing twise in order to make sure that all imports are using the most updated version
             self._run_tests_in_module(test_module)
         except Exception:
             traceback.print_exc()
