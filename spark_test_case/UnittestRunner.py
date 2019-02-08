@@ -37,7 +37,7 @@ class UnittestRunner:
                 if not module_is_main and module_in_working_directory:
                     reload(module)
 
-    def __get_files_in_dir(self, root_dir, ignore_dirs=['\\.git', '\\.idea'], extensions=['py', 'json']):
+    def __get_files_in_dir(self, root_dir, ignore_dirs=consts.IGNORE_DIRS, extensions=consts.EXTENSIONS_TO_WATCH):
         files = []
         file_extensions_pattern = '.*\\.({})$'.format('|'.join(extensions))
         ignore_dirs_pattern = '/({})/'.format('|'.join(ignore_dirs))
