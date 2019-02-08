@@ -2,6 +2,7 @@ import os
 import re
 import sys
 import time
+import traceback
 import unittest
 
 from pyspark import SparkConf, SparkContext
@@ -52,12 +53,18 @@ class UnittestRunner:
         last_modified_time = max(files_modified_time)
         return last_modified_time
 
+    def __try_rerun_tests(self, test_module):
+        try:
+            self.__reload_all_modules()
+            self._run_tests_in_module(test_module)
+        except Exception:
+            traceback.print_exc()
+
     def run(self, test_module, wait_time=3):
         max_modified_time = 0
         while True:
             last_modified_time = self.__get_dir_modified_time(os.getcwd())
             if last_modified_time > max_modified_time:
                 max_modified_time = last_modified_time
-                self.__reload_all_modules()
-                self._run_tests_in_module(test_module)
+                self.__try_rerun_tests(test_module)
             time.sleep(wait_time)
