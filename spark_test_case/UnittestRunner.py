@@ -52,7 +52,7 @@ class UnittestRunner:
         last_modified_time = max(files_modified_time)
         return last_modified_time
 
-    def run(self, test_module):
+    def run(self, test_module, wait_time=3):
         max_modified_time = 0
         while True:
             last_modified_time = self.__get_dir_modified_time(os.getcwd())
@@ -60,4 +60,4 @@ class UnittestRunner:
                 max_modified_time = last_modified_time
                 self.__reload_all_modules()
                 self._run_tests_in_module(test_module)
-            time.sleep(3)
+            time.sleep(wait_time)
