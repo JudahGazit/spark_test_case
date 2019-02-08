@@ -13,15 +13,15 @@ class SparkTestCase(unittest.TestCase):
     def setUpClass(cls):
         cls.spark = SparkSession(SparkContext.getOrCreate())
 
-    def convert_to_dict(self, row):
+    def convert_row_to_dict(self, row):
         if isinstance(row, Row):
-            return self.convert_to_dict(row.asDict())
+            return self.convert_row_to_dict(row.asDict())
         if isinstance(row, dict):
             for key in row:
-                row[key] = self.convert_to_dict(row[key])
+                row[key] = self.convert_row_to_dict(row[key])
             return row
         if isinstance(row, list):
-            return sorted([self.convert_to_dict(item) for item in row])
+            return sorted([self.convert_row_to_dict(item) for item in row])
         return row
 
     def convert_schema_to_list(self, schema):
@@ -36,6 +36,6 @@ class SparkTestCase(unittest.TestCase):
         return schema
 
     def assertDataFramesEqual(self, expected, result, check_columns_order=False):
-        self.assertItemsEqual(self.convert_to_dict(expected.collect()), self.convert_to_dict(result.collect()))
+        self.assertItemsEqual(self.convert_row_to_dict(expected.collect()), self.convert_row_to_dict(result.collect()))
         if check_columns_order:
             self.assertListEqual(self.convert_schema_to_list(expected.schema), self.convert_schema_to_list(result.schema))
